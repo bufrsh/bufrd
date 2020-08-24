@@ -1,11 +1,11 @@
-bufrd is the client daemon for bufr.sh, intended to run on Raspberry Pis. It is
-distributed as a completely static binary, so it should run on all versions of
-pi.
+bufrd is the client daemon for bufr.sh, intended to run on Linux devices. It is
+distributed as a completely static binary, so it should run on most kinds of
+Linux devices.
 
 bufrd is built on the following principles:
 - Never reads or writes to any file except these:
 	- bufr.conf: the only configuration file with activity lines, login
-	information (username and hashed password), and the name of pi set during
+	information (username and hashed password), and the name of device set during
 	installation.
 	- key.pem: SSL private key, generated during installation by the daemon.
 	- cert.pem: SSL certificate, sent by server when the daemon is run for the
@@ -21,13 +21,17 @@ achieve this easily.
 - Fully static binary with no dependencies, not even libc.
 
 ## Compile
-Release versions are compiled using the following commands:
-- `CC=musl-gcc cargo build --release --target=armv7-unknown-linux-musleabihf`
-- `strip target/armv7-unknown-linux-musleabihf/release/bufrd`
-
-For the above compile command to work you will need to have `musl` setup for
-static libc linking. Or, you can just run `cargo build --release` to dynamically
-link it against glibc.
+The release versions are completely statically linked. The following steps are
+taken to generate them:
+```
+# install MUSL
+sudo apt-get update musl musl-dev musl-tools
+CC=musl-gcc cargo build --release --target=$TARGETARCH
+strip target/$TARGETARCH/release/bufrd
+```
+`$TARGETARCH` is `arvm7-unknown-linux-musleabihf` for a RaspberryPi running
+Raspbian OS, and `x86_64-unknown-linux-musl` for a Linux PC. More architectures
+will be released as they are tested.
 
 ## Install
 You can compile the binary yourself using Rust stable toolchain, or you can
